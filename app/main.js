@@ -1,24 +1,39 @@
-var app = angular.module('datetimepickerApp', [])
-    .directive('datetimepickerwrapper', function () {
+angular.module('datepickerApp', [])
+    .directive('datetimepickerManager', function() {
         return {
-            scope: {},
             restrict: 'E',
+            transclude: true,
+            replace: true,
+            scope: {},
             controller: function ($scope) {
-                this.checkDates = function () {
-                    $scope.something = 'pushed';
-                    console.log('woop woop!');
-                }
-            }
+                //
+            },
+            template: '<div ng-transclude></div>'
         };
     })
-    .directive('datetimepicker', function () {
+    .directive('datepicker', function() {
         return {
-            require: 'foo',
-            template: '<button>{{something}}</button>',
-            link: function (scope, element, attrs, wrapperCtrl) {
-                element.on('click', function () {
-                    wrapperCtrl.checkDates();
-                });
-            }
+            require: '^datetimepickerManager',
+            restrict: 'E',
+            replace: true,
+            transclude: true,
+            scope: {},
+            link: function (scope, element, attrs, datetimepickerCtrl) {
+                //
+            },
+            template: '<input placeholder="date" ng-transclude/>'
         };
-    });
+    })
+    .directive('timepicker', function() {
+        return {
+            require: '^datetimepickerManager',
+            restrict: 'E',
+            replace: true,
+            transclude: true,
+            scope: {},
+            link: function (scope, element, attrs, datetimepickerCtrl) {
+                //
+            },
+            template: '<input placeholder="time" ng-transclude/>'
+        };
+    })

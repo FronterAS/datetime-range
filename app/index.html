@@ -1,15 +1,18 @@
 <!DOCTYPE html>
-<html lang="en" ng-app="datetimepickerApp">
+<html lang="en">
     <head>
         <meta charset="utf-8">
         <title>Directive test</title>
     </head>
     <body>
 
-        <div>
-            <datetimepickerwrapper>
-                <datetimepicker></datetimepicker>
-            </datetimepickerwrapper>
+        <div ng-app="datepickerApp">
+            <datetimepicker-manager>
+                <datepicker></datepicker>
+                <timepicker></timepicker>
+                <timepicker></timepicker>
+                <datepicker></datepicker>
+            </datetimepicker-manager>
         </div>
 
         <script src="components/angular/angular.js"></script>
