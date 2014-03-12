@@ -1,22 +1,23 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" ng-app="UIcomponents">
     <head>
         <meta charset="utf-8">
         <title>Directive test</title>
+        <link rel="stylesheet" href="components/pickadate/lib/themes/default.css" />
+        <link rel="stylesheet" href="components/pickadate/lib/themes/default.date.css" />
+        <link rel="stylesheet" href="components/pickadate/lib/themes/default.time.css" />
+        <script src="components/jquery/dist/jquery.js"></script>
+        <script src="components/pickadate/lib/picker.js"></script>
+        <script src="components/pickadate/lib/picker.date.js"></script>
+        <script src="components/pickadate/lib/picker.time.js"></script>
+        <script src="components/angular/angular.js"></script>
+        <script src="main.js"></script>
     </head>
     <body>
 
-        <div ng-app="datepickerApp">
-            <datetimepicker-manager>
-                <datepicker></datepicker>
-                <timepicker></timepicker>
-                <timepicker></timepicker>
-                <datepicker></datepicker>
-                <allday></allday>
-            </datetimepicker-manager>
+        <div ng-controller="MainCtrl">
+            <datetimepicker-manager></datetimepicker-manager>
         </div>
 
-        <script src="components/angular/angular.js"></script>
-        <script src="main.js"></script>
     </body>
 </html>

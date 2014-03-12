@@ -1,0 +1,13 @@
+{
+  "name": "angular",
+  "version": "0.0.0",
+  "authors": [
+    "Gavin King <gavin.king@fronter.com>"
+  ],
+  "description": "A test environment for sharables",
+  "main": "main.js",
+  "license": "MIT",
+  "dependencies": {
+    "pickadate": "~3.4.0"
+  }
+}
