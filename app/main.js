@@ -6,16 +6,10 @@ angular.module('UIcomponents', [])
 
         $scope.$on('allday', shouldNotHear);
     })
-    .directive('datetimepickerManager', function() {
+    .directive('datetimeRange', function() {
         var onAllDayChange = function () {
                 console.log('changed all day');
-            },
-
-            template = '<date-picker></date-picker>' +
-                '<time-picker></time-picker>' +
-                '<time-picker></time-picker>' +
-                '<date-picker></date-picker>' +
-                '<allday></allday>';
+            };
 
         return {
             restrict: 'E',
@@ -23,19 +17,11 @@ angular.module('UIcomponents', [])
             link: function (scope) {
                 scope.$on('allday', onAllDayChange);
             },
-            template: template
+            templateUrl: 'datetimeRange.html'
         };
     })
     .directive('datePicker', function() {
-        var template = '<input ' +
-                    'type="text" placeholder="Try me…" ' +
-                    'readonly="" ' +
-                    'aria-haspopup="true" ' +
-                    'aria-expanded="false" ' +
-                    'aria-readonly="false" />';
-
         return {
-            /*require: '^datetimepickerManager',*/
             restrict: 'E',
             replace: true,
             scope: {},
@@ -46,15 +32,12 @@ angular.module('UIcomponents', [])
 
                 element.pickadate();
             },
-            template: template
+            templateUrl: 'datepicker.html'
 
         };
     })
-    .directive('timePicker', function() {
-        var template = '<input type="time" />';
-
+    .directive('timePicker', function timepickerDirective() {
         return {
-            /*require: '^datetimepickerManager',*/
             restrict: 'E',
             replace: true,
             scope: {},
@@ -65,7 +48,7 @@ angular.module('UIcomponents', [])
 
                 element.pickatime();
             },
-            template: template
+            templateUrl: 'timepicker.html'
         };
     })
     .directive(
@@ -80,9 +63,9 @@ angular.module('UIcomponents', [])
                 replace: true,
                 scope: {}, // create an isolate scope
                 link: function (scope, element, attrs, ctrl) {
+                    // element is a checkbox
                     element.on('change', function () {
-                        console.log('changed allday');
-                        // We $broadcast on the parent, the manager, so that the event
+                        // We $broadcast on the parent, so that the event
                         // travels down the scopes and not up to the controller of the
                         // page, which $emit would do.
                         // Any interaction or event publishing on the controller should
@@ -90,7 +73,7 @@ angular.module('UIcomponents', [])
                         scope.$parent.$broadcast('allday', element.is(':checked'));
                     });
                 },
-                template: '<input type="checkbox" />'
+                templateUrl: 'allday.html'
             };
         });
 
