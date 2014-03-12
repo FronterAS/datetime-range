@@ -4,7 +4,7 @@
   "authors": [
     "Gavin King <gavin.king@fronter.com>"
   ],
-  "description": "A test environment for sharables",
+  "description": "A datetime range ui component",
   "main": "main.js",
   "license": "MIT",
   "dependencies": {
