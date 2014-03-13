@@ -12,117 +12,214 @@ angular.module('UIcomponents', [])
 
         $scope.$on('allday', shouldNotHear);
     })
-    .directive('datetimeRange', function() {
-        var startDateValue,
-            endDateValue,
-            startTimeValue,
-            endTimeValue,
+    .directive('datetimeRange', function datetimeRangeDirective($timeout) {
+        var scope,
 
-            onAllDayChange = function (e, data) {
+            onAllDayChange = function (e, isChecked) {
                 console.log('changed all day');
+                scope.allDay = allDayValue = isChecked;
             },
 
-            onStartDateChange = function (date) {
-                console.log('changed start date');
+            onStartDateChange = function (e, date) {
+                console.log('changed start date to:');
+                console.log(date);
+                scope.$emit('startDateChanged', date);
             },
 
-            onEndDateChange = function (date) {
-                console.log('changed end date');
+            onEndDateChange = function (e, date) {
+                console.log('changed end date to:');
+                console.log(date);
+                scope.$emit('endDateChanged', date);
             },
 
-            onStartTimeChange = function (date) {
-                console.log('changed start time');
+            onStartTimeChange = function (e, time) {
+                console.log('changed start time date to:');
+                console.log(time);
             },
 
-            onEndTimeChange = function (date) {
-                console.log('changed end time');
-            },
-
-            onDateChange = function (e, data) {
-                console.log('changed date');
-            },
-
-            onTimeChange = function (e, data) {
-                console.log('changed time');
+            onEndTimeChange = function (e, time) {
+                console.log('changed end time date to:');
+                console.log(time);
             };
-
-        /*var from_$input = $('#input_from').pickadate(),
-            from_picker = from_$input.pickadate('picker')
-
-        var to_$input = $('#input_to').pickadate(),
-            to_picker = to_$input.pickadate('picker')
-
-
-        // Check if there’s a “from” or “to” date to start with.
-        if ( from_picker.get('value') ) {
-          to_picker.set('min', from_picker.get('select'))
-        }
-        if ( to_picker.get('value') ) {
-          from_picker.set('max', to_picker.get('select'))
-        }
-
-        // When something is selected, update the “from” and “to” limits.
-        from_picker.on('set', function(event) {
-          if ( event.select ) {
-            to_picker.set('min', from_picker.get('select'))
-          }
-        })
-        to_picker.on('set', function(event) {
-          if ( event.select ) {
-            from_picker.set('max', to_picker.get('select'))
-          }
-        })*/
 
         return {
             restrict: 'E',
             scope: {},
-            link: function (scope) {
-                scope.$on('allday', onAllDayChange);
-                scope.$on('dateChange', onDateChange);
+            link: function (_scope_) {
+                scope = _scope_;
+                scope.$on('alldayChange', onAllDayChange);
+                scope.$on('startDateChange', onStartDateChange);
+                scope.$on('endDateChange', onEndDateChange);
+                scope.$on('startTimeChange', onStartTimeChange);
+                scope.$on('endTimeChange', onEndTimeChange);
             },
             templateUrl: 'datetimeRange.html'
         };
     })
-    .directive('datePicker', function() {
-        return {
-            restrict: 'E',
-            replace: true,
-            scope: {},
-            link: function (scope, element, attrs, datetimepickerCtrl) {
-                var api;
+    .directive(
+        'datePicker',
+        /**
+         * Sets up an element as a datepicker.
+         *
+         * @return {object}
+         */
+        function datePickerDirective() {
+            return {
+                restrict: 'E',
+                priority: 0,
+                replace: true,
+                scope: {},
+                link: function (scope, element, attrs) {
+                    element.pickadate();
+                },
+                templateUrl: 'datepicker.html'
+            };
+        }
+    )
+    .directive(
+        'startDate',
+        /**
+         * Handles behaviour specific to a start date in a range directive.
+         *
+         * @return {object}
+         */
+        function startDatePickerDirective($timeout) {
+            return {
+                restrict: 'A',
+                priority: 1,
+                link: function (scope, element, attrs) {
+                    var api = element.pickadate('picker'),
+                        broadcast = function () {
+                            scope.$parent.$broadcast('startDateChange', api.get('select'));
+                        };
 
-                element.on('change', function () {
-                    scope.$parent.$broadcast('dateChange');
-                });
+                    scope.$on('endDateChanged', function (e, date) {
+                        console.log('heard end date change, updating start date');
+                        console.log(date);
+                        api.set('max', date);
+                    });
 
-                element.pickadate();
-                api = element.pickadate('picker');
+                    $timeout(function () {
+                        // this will throw a change event
+                        if (!api.get('select')) {
+                            api.set('select', new Date());
+                        }
+                    }, 0);
 
-                scope.$on('startDateChanged', function (e, data) {
-                    console.log('start date changed');
-                    console.log(data);
-                    // api.set('max', data);
-                });
-            },
-            templateUrl: 'datepicker.html'
+                    element.on('change', broadcast);
+                }
+            };
+        }
+    )
+    .directive(
+        'endDate',
+        /**
+         * Handles behaviour specific to an end date in a range directive.
+         *
+         * @return {object}
+         */
+        function endDatePickerDirective($timeout) {
+            return {
+                restrict: 'A',
+                priority: 1,
+                link: function (scope, element, attrs) {
+                    var api = element.pickadate('picker'),
+                        broadcast = function () {
+                            scope.$parent.$broadcast('endDateChange', api.get('select'));
+                        };
 
-        };
-    })
-    .directive('timePicker', function timepickerDirective() {
-        return {
-            restrict: 'E',
-            replace: true,
-            scope: {},
-            link: function (scope, element, attrs, datetimepickerCtrl) {
-                element.on('change', function () {
-                    console.log('changed time');
-                });
+                    scope.$on('startDateChanged', function (e, date) {
+                        console.log('heard start date change, updating end date');
+                        console.log(date);
+                        api.set('min', date);
+                    });
 
-                element.pickatime();
-            },
-            templateUrl: 'timepicker.html'
-        };
-    })
+                    $timeout(function () {
+                        // this will throw a change event
+                        if (!api.get('select')) {
+                            api.set('select', new Date());
+                        }
+                    }, 0);
+
+                    element.on('change', broadcast);
+                }
+            };
+        }
+    )
+    .directive(
+        'timePicker',
+        /**
+         * Sets up an element as a timepicker.
+         *
+         * @return {object}
+         */
+        function timePickerDirective() {
+            return {
+                restrict: 'E',
+                priority: 0,
+                replace: true,
+                scope: {},
+                link: function (scope, element, attrs) {
+                    element.pickatime();
+                },
+                templateUrl: 'timepicker.html'
+            };
+        }
+    )
+    .directive(
+        'startTime',
+        /**
+         * Handles behaviour specific to an start time in a range directive.
+         *
+         * @return {object}
+         */
+        function startTimePickerDirective() {
+            return {
+                restrict: 'A',
+                priority: 1,
+                link: function (scope, element, attrs) {
+                    var api = element.pickatime('picker');
+
+                    element.on('change', function () {
+                        scope.$parent.$broadcast('startTimeChange', api.get('select'));
+                    });
+
+                    scope.$on('endTimeChanged', function (e, data) {
+                        console.log('heard end time change, updating start time');
+                        console.log(data);
+                        // api.set('max', data);
+                    });
+                }
+            };
+        }
+    )
+    .directive(
+        'endTime',
+        /**
+         * Handles behaviour specific to an end time in a range directive.
+         *
+         * @return {object}
+         */
+        function endTimePickerDirective() {
+            return {
+                restrict: 'A',
+                priority: 1,
+                link: function (scope, element, attrs) {
+                    var api = element.pickatime('picker');
+
+                    element.on('change', function () {
+                        scope.$parent.$broadcast('endTimeChange');
+                    });
+
+                    scope.$on('startTimeChanged', function (e, data) {
+                        console.log('heard start time change, updating end time');
+                        console.log(data);
+                        // api.set('max', data);
+                    });
+                }
+            };
+        }
+    )
     .directive(
         'allday',
         /**
@@ -134,7 +231,7 @@ angular.module('UIcomponents', [])
                 restrict: 'E',
                 replace: true,
                 scope: {}, // create an isolate scope
-                link: function (scope, element, attrs, ctrl) {
+                link: function (scope, element, attrs) {
                     // element is a checkbox
                     element.on('change', function () {
                         // We $broadcast on the parent, so that the event
@@ -142,9 +239,10 @@ angular.module('UIcomponents', [])
                         // page, which $emit would do.
                         // Any interaction or event publishing on the controller should
                         // be taken care of by the manager.
-                        scope.$parent.$broadcast('allday', element.is(':checked'));
+                        scope.$parent.$broadcast('alldayChange', element.is(':checked'));
                     });
                 },
                 templateUrl: 'allday.html'
             };
-        });
+        }
+    );
