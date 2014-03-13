@@ -6,19 +6,60 @@ http://stackoverflow.com/questions/21501760/ng-transclude-in-directive-and-sendi
  */
 angular.module('UIcomponents', [])
     .controller('MainCtrl', function ($scope) {
-        var shouldNotHear = function () {
-                console.error('Should not hear this');
-            };
+        var shouldHear = function (e, data) {
+                console.info('Top controller heard ' + e.name);
+            },
 
-        $scope.$on('allday', shouldNotHear);
+            rangePicker = angular.element('#datetimeRangePicker');
+
+        $scope.onSubmit = function () {
+            var postData = rangePicker.data('datetimeRange');
+            console.log(postData);
+        };
+
+        // much topic, so callback, wow
+        $scope.$on('allDayChange', shouldHear);
+        $scope.$on('startDateChange', shouldHear);
+        $scope.$on('endDateChange', shouldHear);
+        $scope.$on('startTimeChange', shouldHear);
+        $scope.$on('endTimeChange', shouldHear);
     })
     .directive('datetimeRange', function datetimeRangeDirective($timeout) {
         var scope,
+            element,
+
+            datetimeRange = {
+                'startTime': null,
+                'endTime': null,
+                'startDate': null,
+                'endDate': null,
+                'allDay': false
+            },
+
+            updateData = function (key, value) {
+                if (value === null) {
+                    delete datetimeRange[key];
+
+                } else {
+                    datetimeRange[key] = value;
+                }
+
+                element.data('datetimeRange', datetimeRange);
+            },
 
             onAllDayChange = function (e, isChecked) {
                 console.info('changed all day to:');
                 scope.allDay = isChecked;
                 console.log(scope.allDay);
+
+                updateData('allDay', scope.allDay);
+
+                if (scope.allDay) {
+                    updateData('startTime', null);
+                    updateData('endTime', null);
+                }
+
+                scope.$broadcast('allDayChanged', scope.allDay);
 
                 // our ng-if badly needs to know about this
                 scope.$apply();
@@ -27,23 +68,27 @@ angular.module('UIcomponents', [])
             onStartDateChange = function (e, date) {
                 console.info('changed start date to:');
                 console.info(date);
+                updateData('startDate', date);
                 scope.$broadcast('startDateChanged', date);
             },
 
             onEndDateChange = function (e, date) {
                 console.info('changed end date to:');
                 console.info(date);
+                updateData('endDate', date);
                 scope.$broadcast('endDateChanged', date);
             },
 
             onStartTimeChange = function (e, time) {
                 console.info('changed start time to:');
                 console.info(time);
+                updateData('startTime', time);
             },
 
             onEndTimeChange = function (e, time) {
                 console.info('changed end time to:');
                 console.info(time);
+                updateData('endTime', time);
             };
 
         return {
@@ -53,8 +98,10 @@ angular.module('UIcomponents', [])
                 timeFormat: '@'
             },
 
-            link: function (_scope_) {
+            link: function (_scope_, _element_) {
                 scope = _scope_;
+                element = _element_;
+
                 scope.now = new Date();
 
                 // much topic, so callback, wow
@@ -82,7 +129,8 @@ angular.module('UIcomponents', [])
                 scope: true,
                 link: function (scope, element, attrs) {
                     element.pickadate({
-                        'format': scope.dateFormat
+                        'format': scope.dateFormat,
+                        'formatSubmit': scope.dateFormat
                     });
                 },
                 templateUrl: 'datepicker.html'
@@ -117,7 +165,7 @@ angular.module('UIcomponents', [])
                     }, 0);
 
                     element.on('change', function () {
-                        scope.$emit('startDateChange', api.get('select'));
+                        scope.$emit('startDateChange', api.get('value'));
                     });
                 }
             };
@@ -151,7 +199,7 @@ angular.module('UIcomponents', [])
                     }, 0);
 
                     element.on('change', function () {
-                        scope.$emit('endDateChange', api.get('select'));
+                        scope.$emit('endDateChange', api.get('value'));
                     });
                 }
             };
@@ -174,6 +222,12 @@ angular.module('UIcomponents', [])
                     element.pickatime({
                         format: scope.timeFormat
                     });
+
+                    scope.$on('allDayChanged', function (e, isChecked) {
+                        if (!isChecked) {
+                            element.trigger('change');
+                        }
+                    });
                 },
                 templateUrl: 'timepicker.html'
             };
@@ -193,16 +247,16 @@ angular.module('UIcomponents', [])
                 link: function (scope, element, attrs) {
                     var api = element.pickatime('picker');
 
-                    element.on('change', function () {
-                        scope.$emit('startTimeChange', api.get('select'));
-                    });
-
                     $timeout(function () {
                         // this will throw a change event
                         if (!api.get('select')) {
                             api.set('select', scope.now);
                         }
                     }, 0);
+
+                    element.on('change', function () {
+                        scope.$emit('startTimeChange', api.get('value'));
+                    });
                 }
             };
         }
@@ -221,10 +275,6 @@ angular.module('UIcomponents', [])
                 link: function (scope, element, attrs) {
                     var api = element.pickatime('picker');
 
-                    element.on('change', function () {
-                        scope.$emit('endTimeChange', api.get('select'));
-                    });
-
                     $timeout(function () {
                         // clone the date...
                         var inAnHour = scope.now;
@@ -236,6 +286,10 @@ angular.module('UIcomponents', [])
                             api.set('select', inAnHour);
                         }
                     }, 0);
+
+                    element.on('change', function () {
+                        scope.$emit('endTimeChange', api.get('value'));
+                    });
                 }
             };
         }
@@ -244,13 +298,13 @@ angular.module('UIcomponents', [])
         'allday',
         /**
          * This directive shares the scope of the parent directive.
-         * @return {function} [description]
+         * @return {object}
          */
         function allDayDirective() {
             return {
                 restrict: 'E',
                 replace: true,
-                scope: true, // create a child scope
+                scope: true,
                 link: function (scope, element, attrs) {
                     // element is a checkbox
                     element.on('change', function () {

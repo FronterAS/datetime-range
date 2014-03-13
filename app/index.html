@@ -16,7 +16,14 @@
     <body>
 
         <div ng-controller="MainCtrl">
-            <datetime-range date-format="yyyy-mm-dd" time-format="HH:i"></datetime-range>
+            <form ng-submit="onSubmit()">
+                <datetime-range
+                    id="datetimeRangePicker"
+                    date-format="yyyy-mm-dd"
+                    time-format="HH:i">
+                </datetime-range>
+                <input type="submit" />
+            </form>
         </div>
 
     </body>
