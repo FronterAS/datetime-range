@@ -3,15 +3,27 @@
     <head>
         <meta charset="utf-8">
         <title>Directive test</title>
+
+        <!-- build:css main.css -->
         <link rel="stylesheet" href="components/pickadate/lib/themes/default.css" />
         <link rel="stylesheet" href="components/pickadate/lib/themes/default.date.css" />
         <link rel="stylesheet" href="components/pickadate/lib/themes/default.time.css" />
+        <!-- endbuild -->
+
+        <!-- build:js vendors.js -->
         <script src="components/jquery/dist/jquery.js"></script>
+        <script src="components/momentjs/moment.js"></script>
         <script src="components/pickadate/lib/picker.js"></script>
         <script src="components/pickadate/lib/picker.date.js"></script>
         <script src="components/pickadate/lib/picker.time.js"></script>
+        <!-- endbuild -->
+
+        <!-- build:js application.js -->
         <script src="components/angular/angular.js"></script>
         <script src="main.js"></script>
+        <script src="extras.js"></script>
+        <!-- endbuild -->
+
     </head>
     <body>
 
@@ -20,7 +32,7 @@
                 <datetime-range
                     id="datetimeRangePicker"
                     date-format="yyyy-mm-dd"
-                    time-format="HH:i">
+                    time-format="HH:mm">
                 </datetime-range>
                 <input type="submit" />
             </form>
