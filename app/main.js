@@ -49,7 +49,8 @@ angular.module('UIcomponents', [])
         return {
             restrict: 'E',
             scope: {
-                dateFormat: '@'
+                dateFormat: '@',
+                timeFormat: '@'
             },
 
             link: function (_scope_) {
@@ -80,9 +81,9 @@ angular.module('UIcomponents', [])
                 replace: true,
                 scope: true,
                 link: function (scope, element, attrs) {
-                    element.pickadate(/*{
+                    element.pickadate({
                         'format': scope.dateFormat
-                    }*/);
+                    });
                 },
                 templateUrl: 'datepicker.html'
             };
@@ -170,7 +171,9 @@ angular.module('UIcomponents', [])
                 replace: true,
                 scope: true,
                 link: function (scope, element, attrs) {
-                    element.pickatime();
+                    element.pickatime({
+                        format: scope.timeFormat
+                    });
                 },
                 templateUrl: 'timepicker.html'
             };
