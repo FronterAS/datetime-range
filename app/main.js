@@ -27,13 +27,13 @@ angular.module('UIcomponents', [])
             onStartDateChange = function (e, date) {
                 console.info('changed start date to:');
                 console.info(date);
-                scope.$emit('startDateChanged', date);
+                scope.$broadcast('startDateChanged', date);
             },
 
             onEndDateChange = function (e, date) {
                 console.info('changed end date to:');
                 console.info(date);
-                scope.$emit('endDateChanged', date);
+                scope.$broadcast('endDateChanged', date);
             },
 
             onStartTimeChange = function (e, time) {
@@ -80,9 +80,9 @@ angular.module('UIcomponents', [])
                 replace: true,
                 scope: true,
                 link: function (scope, element, attrs) {
-                    element.pickadate({
+                    element.pickadate(/*{
                         'format': scope.dateFormat
-                    });
+                    }*/);
                 },
                 templateUrl: 'datepicker.html'
             };
@@ -100,10 +100,7 @@ angular.module('UIcomponents', [])
                 restrict: 'A',
                 priority: 1,
                 link: function (scope, element, attrs) {
-                    var api = element.pickadate('picker'),
-                        broadcast = function () {
-                            scope.$parent.$broadcast('startDateChange', api.get('select'));
-                        };
+                    var api = element.pickadate('picker');
 
                     scope.$on('endDateChanged', function (e, date) {
                         console.info('heard end date change, updating start date');
@@ -118,7 +115,9 @@ angular.module('UIcomponents', [])
                         }
                     }, 0);
 
-                    element.on('change', broadcast);
+                    element.on('change', function () {
+                        scope.$emit('startDateChange', api.get('select'));
+                    });
                 }
             };
         }
@@ -135,10 +134,7 @@ angular.module('UIcomponents', [])
                 restrict: 'A',
                 priority: 1,
                 link: function (scope, element, attrs) {
-                    var api = element.pickadate('picker'),
-                        broadcast = function () {
-                            scope.$parent.$broadcast('endDateChange', api.get('select'));
-                        };
+                    var api = element.pickadate('picker');
 
                     scope.$on('startDateChanged', function (e, date) {
                         console.info('heard start date change, updating end date');
@@ -153,7 +149,9 @@ angular.module('UIcomponents', [])
                         }
                     }, 0);
 
-                    element.on('change', broadcast);
+                    element.on('change', function () {
+                        scope.$emit('endDateChange', api.get('select'));
+                    });
                 }
             };
         }
@@ -193,7 +191,7 @@ angular.module('UIcomponents', [])
                     var api = element.pickatime('picker');
 
                     element.on('change', function () {
-                        scope.$parent.$broadcast('startTimeChange', api.get('select'));
+                        scope.$emit('startTimeChange', api.get('select'));
                     });
 
                     $timeout(function () {
@@ -221,7 +219,7 @@ angular.module('UIcomponents', [])
                     var api = element.pickatime('picker');
 
                     element.on('change', function () {
-                        scope.$parent.$broadcast('endTimeChange', api.get('select'));
+                        scope.$emit('endTimeChange', api.get('select'));
                     });
 
                     $timeout(function () {
@@ -249,16 +247,13 @@ angular.module('UIcomponents', [])
             return {
                 restrict: 'E',
                 replace: true,
-                scope: true, // create an isolate scope
+                scope: true, // create a child scope
                 link: function (scope, element, attrs) {
                     // element is a checkbox
                     element.on('change', function () {
-                        // We $broadcast on the parent, so that the event
-                        // travels down the scopes and not up to the controller of the
-                        // page, which $emit would do.
-                        // Any interaction or event publishing on the controller should
-                        // be taken care of by the manager.
-                        scope.$parent.$broadcast('allDayChange', element.is(':checked'));
+                        // We $emit the event up to the parent, so that the event
+                        // can be detected if wanted on all parent controllers.
+                        scope.$emit('allDayChange', element.is(':checked'));
                     });
                 },
                 templateUrl: 'allday.html'
