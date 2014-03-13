@@ -1,7 +1,5 @@
 <date-picker start-date></date-picker>
-<span ng-if="!allDay">
-    <time-picker start-time></time-picker>
-    <time-picker end-time></time-picker>
-</span>
+<time-picker start-time ng-hide="allDay"></time-picker>
+<time-picker end-time ng-hide="allDay"></time-picker>
 <date-picker end-date></date-picker>
 <allday></allday>
