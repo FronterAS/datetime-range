@@ -11,4 +11,3 @@ Currently only available as an angular directive in the master branch.
 As compliant to open standards as possible. See firefox's web components.
 * Unit tests
 * Example page
-* Injecting properties through attributes, for instance date format.
