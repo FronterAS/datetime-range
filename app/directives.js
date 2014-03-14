@@ -182,22 +182,43 @@ angular.module('UIcomponents')
          *
          * @return {object}
          */
-        function timePickerDirective() {
+        function timePickerDirective($timeout) {
             return {
                 restrict: 'E',
                 priority: 3,
                 replace: true,
                 scope: true,
                 link: function (scope, element, attrs) {
+
                     element.pickatime({
                         format: scope.timeFormat.replace('mm', 'i')
                     });
+
+                    scope.setup = function (time) {
+                        $timeout(function () {
+                            // this will throw a change event
+                            if (!scope.api.get('select')) {
+                                scope.api.set('select', time);
+                            }
+                        }, 0);
+                    }
+
+                    scope.api = element.pickatime('picker');
 
                     scope.$on('allDayChanged', function (e, isChecked) {
                         if (!isChecked) {
                             element.trigger('change');
                         }
                     });
+
+                    scope.setupChangeEvent = function (name) {
+                        element.on('change', function () {
+                            scope.$emit(name + 'TimeChange', {
+                                'data': scope.api.get('select'),
+                                'value': scope.api.get('value')
+                            });
+                        });
+                    };
                 },
                 templateUrl: 'timepicker.html'
             };
@@ -210,32 +231,26 @@ angular.module('UIcomponents')
          *
          * @return {object}
          */
-        function startTimePickerDirective($timeout, DatetimeHelper) {
+        function startTimePickerDirective(DatetimeHelper) {
             return {
                 restrict: 'A',
                 priority: 4,
                 link: function (scope, element, attrs) {
-                    var api = element.pickatime('picker');
+                    var setMaxTime = function (e, endTime) {
+                            var max = false;
 
-                    $timeout(function () {
-                        // this will throw a change event
-                        if (!api.get('select')) {
-                            api.set('select', DatetimeHelper.getTime(scope.timeFormat));
-                        }
-                    }, 0);
+                            if (scope.isSameDay()) {
+                                max = endTime;
+                            }
 
-                    scope.$on('endTimeChanged', function (e, time) {
-                        if (scope.isSameDay()) {
-                            api.set('max', time);
-                        }
-                    });
+                            scope.api.set('max', max);
+                        };
 
-                    element.on('change', function () {
-                        scope.$emit('startTimeChange', {
-                            'data': api.get('select'),
-                            'value': api.get('value')
-                        });
-                    });
+                    scope.setup(DatetimeHelper.getTime(scope.timeFormat));
+                    scope.$on('endTimeChanged', setMaxTime);
+                    scope.$on('startDateChanged', setMaxTime);
+                    scope.$on('endDateChanged', setMaxTime);
+                    scope.setupChangeEvent('start');
                 }
             };
         }
@@ -247,32 +262,28 @@ angular.module('UIcomponents')
          *
          * @return {object}
          */
-        function endTimePickerDirective($timeout, DatetimeHelper) {
+        function endTimePickerDirective(DatetimeHelper) {
             return {
                 restrict: 'A',
                 priority: 5,
                 link: function (scope, element, attrs) {
-                    var api = element.pickatime('picker');
+                    var setMinTime = function (e, startTime) {
+                        var min = false;
 
-                    $timeout(function () {
-                        // this will throw a change event
-                        if (!api.get('select')) {
-                            api.set('select', DatetimeHelper.getTime(scope.timeFormat, 1));
-                        }
-                    }, 0);
-
-                    scope.$on('startTimeChanged', function (e, time) {
                         if (scope.isSameDay()) {
-                            api.set('min', time);
+                            min = startTime;
                         }
-                    });
 
-                    element.on('change', function () {
-                        scope.$emit('endTimeChange', {
-                            'data': api.get('select'),
-                            'value': api.get('value')
-                        });
-                    });
+                        scope.api.set('min', min);
+                    };
+
+                    scope.setup(DatetimeHelper.getTime(scope.timeFormat, 1));
+
+                    scope.$on('startTimeChanged', setMinTime);
+                    scope.$on('startDateChanged', setMinTime);
+                    scope.$on('endDateChanged', setMinTime);
+
+                    scope.setupChangeEvent('end');
                 }
             };
         }
