@@ -2,6 +2,10 @@
 
 angular.module('UIcomponents')
     .service('DatetimeHelper', function DatetimeHelper() {
+        var hasValue = function (str) {
+                return str !== undefined && str !== null;
+            };
+
         return {
             /**
              * Wraps momentjs startOf('day')
@@ -40,6 +44,8 @@ angular.module('UIcomponents')
                     parts = time.split(':');
                     m.hours(parseInt(parts[0], 10));
                     m.minutes(parseInt(parts[1], 10));
+                    m.seconds(0);
+                    m.milliseconds(0);
                 }
 
                 return m.toISOString();
@@ -50,6 +56,8 @@ angular.module('UIcomponents')
              * @param {formatString} formatString A valid date format string.
              */
             getDate: function (formatString) {
+                formatString = formatString || 'yyyy-mm-dd';
+
                 return moment().format(formatString);
             },
 
@@ -57,17 +65,19 @@ angular.module('UIcomponents')
              * @public
              * @param {string} formatString A valid time format string.
              *                              Defaults to 'HH:mm'
+             * @param {number} hours Hours to offset by.
+             * @param {number} minutes Minutes to offset by.
              */
             getTime: function (formatString, hours, minutes) {
                 var m = moment();
 
                 formatString = formatString || 'HH:mm';
 
-                if (hours !== undefined) {
+                if (hasValue(hours)) {
                     m.add('hours', hours);
                 }
 
-                if (minutes !== undefined) {
+                if (hasValue(minutes)) {
                     m.add('minutes', minutes);
                 }
 
@@ -168,8 +178,17 @@ angular.module('UIcomponents')
                     if (isAllDay) {
                         // startDate and endDate always exist
                         setDateTime('start', DatetimeHelper.getStartOfDay(data.startDate));
-                        setDateTime('end', DatetimeHelper.getEndOfDay(data.startDate));
+                        setDateTime('end', DatetimeHelper.getEndOfDay(data.endDate));
+
+                    } else {
+                        setStartDate(data.startDate);
+                        setEndDate(data.endDate);
                     }
+                },
+
+                isSameDay = function () {
+                    return DatetimeHelper.getStartOfDay(data.startDate) ===
+                        DatetimeHelper.getStartOfDay(data.endDate);
                 },
 
                 /**
@@ -186,6 +205,7 @@ angular.module('UIcomponents')
                 'setStartTime': setStartTime,
                 'setEndTime': setEndTime,
                 'setAllDay': setAllDay,
+                'isSameDay': isSameDay,
                 'getData': getData
             };
         };

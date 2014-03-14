@@ -5,6 +5,8 @@ Wrapping the pickadate.js library to create a google style date and time range p
 
 Currently only available as an angular directive in the master branch.
 
+Please note that the data currently kicked out is simply an ISOString so don't panic if the time looks wrong!
+
 # What's next
 
 * A polymer/webcomponent version.

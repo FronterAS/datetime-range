@@ -46,19 +46,17 @@ angular.module('UIcomponents')
                 },
 
                 onStartTimeChange = function (e, time) {
-                    datetimeRange.setStartTime(time);
+                    datetimeRange.setStartTime(time.value);
                     updateData();
 
-                    scope.$broadcast('startTimeChanged', time);
+                    scope.$broadcast('startTimeChanged', time.data);
                 },
 
                 onEndTimeChange = function (e, time) {
-                    datetimeRange.setEndTime(time);
-                    scope.$broadcast('endTimeChanged', time);
-                },
+                    datetimeRange.setEndTime(time.value);
+                    updateData();
 
-                isSameDay = function () {
-                    return datetimeRange.startDate === datetimeRange.endDate;
+                    scope.$broadcast('endTimeChanged', time.data);
                 };
 
             return {
@@ -72,7 +70,8 @@ angular.module('UIcomponents')
                     scope = _scope_;
                     element = _element_;
 
-                    scope.isSameDay = isSameDay;
+                    // We need this function in the other directives
+                    scope.isSameDay = datetimeRange.isSameDay;
 
                     // much topic, so callback, wow
                     scope.$on('allDayChange', onAllDayChange);
@@ -232,7 +231,10 @@ angular.module('UIcomponents')
                     });
 
                     element.on('change', function () {
-                        scope.$emit('startTimeChange', api.get('value'));
+                        scope.$emit('startTimeChange', {
+                            'data': api.get('select'),
+                            'value': api.get('value')
+                        });
                     });
                 }
             };
@@ -266,7 +268,10 @@ angular.module('UIcomponents')
                     });
 
                     element.on('change', function () {
-                        scope.$emit('endTimeChange', api.get('value'));
+                        scope.$emit('endTimeChange', {
+                            'data': api.get('select'),
+                            'value': api.get('value')
+                        });
                     });
                 }
             };
