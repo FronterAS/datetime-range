@@ -102,6 +102,8 @@ angular.module('UIcomponents')
                         'format': scope.dateFormat,
                         'formatSubmit': scope.dateFormat
                     });
+
+                    scope.api = element.pickadate('picker');
                 },
                 templateUrl: 'datepicker.html'
             };
@@ -119,23 +121,21 @@ angular.module('UIcomponents')
                 restrict: 'A',
                 priority: 1,
                 link: function (scope, element, attrs) {
-                    var api = element.pickadate('picker');
-
                     scope.$on('endDateChanged', function (e, date) {
                         console.info('heard end date change, updating start date max');
                         console.info(date);
-                        api.set('max', date, { format: scope.dateFormat });
+                        scope.api.set('max', date, { format: scope.dateFormat });
                     });
 
                     $timeout(function () {
                         // this will throw a change event
-                        if (!api.get('select')) {
-                            api.set('select', DatetimeHelper.getDate(scope.dateFormat));
+                        if (!scope.api.get('select')) {
+                            scope.api.set('select', DatetimeHelper.getDate(scope.dateFormat));
                         }
                     }, 0);
 
                     element.on('change', function () {
-                        scope.$emit('startDateChange', api.get('value'));
+                        scope.$emit('startDateChange', scope.api.get('value'));
                     });
                 }
             };
@@ -153,23 +153,21 @@ angular.module('UIcomponents')
                 restrict: 'A',
                 priority: 2,
                 link: function (scope, element, attrs) {
-                    var api = element.pickadate('picker');
-
                     scope.$on('startDateChanged', function (e, date) {
                         console.info('heard start date change, updating end date min');
                         console.info(date);
-                        api.set('min', date, { format: scope.dateFormat });
+                        scope.api.set('min', date, { format: scope.dateFormat });
                     });
 
                     $timeout(function () {
                         // this will throw a change event
-                        if (!api.get('select')) {
-                            api.set('select', DatetimeHelper.getDate(scope.dateFormat));
+                        if (!scope.api.get('select')) {
+                            scope.api.set('select', DatetimeHelper.getDate(scope.dateFormat));
                         }
                     }, 0);
 
                     element.on('change', function () {
-                        scope.$emit('endDateChange', api.get('value'));
+                        scope.$emit('endDateChange', scope.api.get('value'));
                     });
                 }
             };
