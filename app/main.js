@@ -3,7 +3,7 @@
 angular.module('UIcomponents', [])
     .controller('MainCtrl', function ($scope) {
         var shouldHear = function (e, data) {
-                console.info('Top controller heard ' + e.name);
+                // console.info('Top controller heard ' + e.name);
             },
 
             rangePicker = angular.element('#datetimeRangePicker');
