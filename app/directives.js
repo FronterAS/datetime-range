@@ -190,6 +190,8 @@ angular.module('UIcomponents')
          * @return {object}
          */
         function timePickerDirective($timeout) {
+            var hasTimeInput = Modernizr.inputtypes.time;
+
             return {
                 templateUrl: 'timepicker.html',
                 restrict: 'E',
@@ -200,35 +202,54 @@ angular.module('UIcomponents')
                 link: function (scope, element, attrs) {
                     console.info('linking timepicker');
 
-                    element.pickatime({
-                        'format': scope.timeFormat.replace('mm', 'i'),
-                        'clear': false
-                    });
+                    if (!hasTimeInput) {
+                        element.pickatime({
+                            'format': scope.timeFormat.replace('mm', 'i'),
+                            'clear': false
+                        });
+
+                        scope.api = element.pickatime('picker');
+
+                    } else {
+                        element.removeAttr('readonly');
+                    }
 
                     scope.setup = function (time) {
+
                         $timeout(function () {
-                            if (!scope.api.get('select')) {
+                            if (hasTimeInput) {
+                                element.val(time);
+
+                            } else if (!hasTimeInput && !scope.api.get('select')) {
                                 scope.api.set('select', time);
+
                             }
                         }, 100);
                     };
 
-                    scope.api = element.pickatime('picker');
+                    scope.setupSetEvent = function (name) {
+                        if (!hasTimeInput) {
+                            scope.api.on('set', function () {
+                                scope.$emit(name, {
+                                    'data': scope.api.get('select'),
+                                    'value': scope.api.get('value')
+                                });
+                            });
+                        } else {
+                            element.on('change', function () {
+                                scope.$emit(name, {
+                                    'data': element.val(),
+                                    'value': element.val()
+                                });
+                            });
+                        }
+                    };
 
                     scope.$on('allDayChanged', function (e, isChecked) {
                         if (!isChecked) {
-                            element.trigger('change');
+                            scope.api.trigger('set');
                         }
                     });
-
-                    scope.setupSetEvent = function (name) {
-                        scope.api.on('set', function () {
-                            scope.$emit(name, {
-                                'data': scope.api.get('select'),
-                                'value': scope.api.get('value')
-                            });
-                        });
-                    };
                 }
             };
         }
