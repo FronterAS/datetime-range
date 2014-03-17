@@ -170,7 +170,6 @@ angular.module('UIcomponents')
                         var selectedDate = scope.api.get('select');
 
                         console.info('endDate heard startDateChanged, setting end date min');
-                        scope.api.set('min', startDate, { format: scope.dateFormat });
 
                         if (selectedDate && selectedDate.pick < startDate.pick) {
                             scope.api.set('select', startDate);
@@ -203,7 +202,9 @@ angular.module('UIcomponents')
                     element.pickatime({
                         'format': scope.timeFormat.replace('mm', 'i'),
                         'clear': false,
-                        'interval': 15
+                        'interval': 10,
+                        'min': [6,0],
+                        'max': [18,0]
                     });
 
                     scope.setup = function (time) {
@@ -277,10 +278,7 @@ angular.module('UIcomponents')
                             if (selectedTime && startTime.pick > selectedTime.pick) {
                                 scope.api.set('selected', startTime);
                             }
-                            min = startTime;
                         }
-
-                        scope.api.set('min', min);
                     };
 
                     // setup events first
