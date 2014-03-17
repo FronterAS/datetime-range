@@ -202,7 +202,8 @@ angular.module('UIcomponents')
 
                     element.pickatime({
                         'format': scope.timeFormat.replace('mm', 'i'),
-                        'clear': false
+                        'clear': false,
+                        'interval': 15
                     });
 
                     scope.setup = function (time) {
