@@ -82,6 +82,22 @@ angular.module('UIcomponents')
                 }
 
                 return m.format(formatString);
+            },
+
+            /**
+             * Accepts time in format HH:mm
+             *
+             * @todo Make this accept any time format
+             * @param  {string} time Time string
+             * @return {array}       Time as array.
+             */
+            timeToArray: function (time) {
+                var parts = time.split(':');
+
+                return [
+                    parseInt(parts[0], 10),
+                    parseInt(parts[1], 10)
+                ];
             }
         };
     })

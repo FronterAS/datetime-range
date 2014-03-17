@@ -63,10 +63,12 @@ angular.module('UIcomponents')
                 restrict: 'E',
                 scope: {
                     dateFormat: '@',
-                    timeFormat: '@'
+                    timeFormat: '@',
+                    minTime: '@',
+                    maxTime: '@'
                 },
 
-                link: function (_scope_, _element_) {
+                link: function (_scope_, _element_, attrs) {
                     console.info('linking datetimeRange');
 
                     scope = _scope_;
@@ -188,7 +190,7 @@ angular.module('UIcomponents')
          *
          * @return {object}
          */
-        function timePickerDirective($timeout) {
+        function timePickerDirective($timeout, DatetimeHelper) {
             return {
                 templateUrl: 'timepicker.html',
                 restrict: 'E',
@@ -203,8 +205,8 @@ angular.module('UIcomponents')
                         'format': scope.timeFormat.replace('mm', 'i'),
                         'clear': false,
                         'interval': 10,
-                        'min': [6,0],
-                        'max': [18,0]
+                        'min': DatetimeHelper.timeToArray(scope.minTime),
+                        'max': DatetimeHelper.timeToArray(scope.maxTime)
                     });
 
                     scope.setup = function (time) {
