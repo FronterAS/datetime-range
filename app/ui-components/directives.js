@@ -1,6 +1,9 @@
 'use strict';
 
-angular.module('UIcomponents')
+/**
+ * @required datePicker, timePicker
+ */
+angular.module('ui-components')
     .directive(
         'datetimeRange',
         function datetimeRangeDirective(DatetimeRange) {
@@ -88,55 +91,6 @@ angular.module('UIcomponents')
         }
     )
     .directive(
-        'datePicker',
-        /**
-         * Sets up an element as a datepicker.
-         *
-         * @return {object}
-         */
-        function datePickerDirective($timeout, DatetimeHelper) {
-            return {
-                templateUrl: 'datepicker.html',
-                restrict: 'E',
-                priority: 0,
-                replace: true,
-                scope: true,
-
-                link: function (scope, element, attrs) {
-                    console.info('linking datepicker');
-
-                    element.pickadate({
-                        'format': scope.dateFormat,
-                        'formatSubmit': scope.dateFormat,
-                        'selectMonths': true,
-                        'selectYears': true,
-                        'clear': false
-                    });
-
-                    scope.api = element.pickadate('picker');
-
-                    scope.setupSetEvent = function (name) {
-                        scope.api.on('set', function () {
-                            scope.$emit(name, {
-                                'value': scope.api.get('value'),
-                                'data': scope.api.get('select')
-                            });
-                        });
-                    };
-
-                    $timeout(function () {
-                        if (!scope.api.get('select')) {
-                            scope.api.set(
-                                'select',
-                                DatetimeHelper.getDate(scope.dateFormat)
-                            );
-                        }
-                    }, 100);
-                }
-            };
-        }
-    )
-    .directive(
         'startDate',
         /**
          * Handles behaviour specific to a start date in a range directive.
@@ -179,60 +133,6 @@ angular.module('UIcomponents')
                     });
 
                     scope.setupSetEvent('endDateChange');
-                }
-            };
-        }
-    )
-    .directive(
-        'timePicker',
-        /**
-         * Sets up an element as a timepicker.
-         *
-         * @return {object}
-         */
-        function timePickerDirective($timeout, DatetimeHelper) {
-            return {
-                templateUrl: 'timepicker.html',
-                restrict: 'E',
-                priority: 3,
-                replace: true,
-                scope: true,
-
-                link: function (scope, element, attrs) {
-                    console.info('linking timepicker');
-
-                    element.pickatime({
-                        'format': scope.timeFormat.replace('mm', 'i'),
-                        'clear': false,
-                        'interval': 10,
-                        'min': DatetimeHelper.timeToArray(scope.minTime),
-                        'max': DatetimeHelper.timeToArray(scope.maxTime)
-                    });
-
-                    scope.setup = function (time) {
-                        $timeout(function () {
-                            if (!scope.api.get('select')) {
-                                scope.api.set('select', time);
-                            }
-                        }, 100);
-                    };
-
-                    scope.api = element.pickatime('picker');
-
-                    scope.$on('allDayChanged', function (e, isChecked) {
-                        if (!isChecked) {
-                            element.trigger('change');
-                        }
-                    });
-
-                    scope.setupSetEvent = function (name) {
-                        scope.api.on('set', function () {
-                            scope.$emit(name, {
-                                'data': scope.api.get('select'),
-                                'value': scope.api.get('value')
-                            });
-                        });
-                    };
                 }
             };
         }

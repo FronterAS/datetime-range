@@ -1,6 +1,6 @@
 'use strict';
 
-angular.module('UIcomponents', [])
+angular.module('UIcomponents', ['templates-main'])
     .controller('MainCtrl', function ($scope) {
         var shouldHear = function (e, data) {
                 // console.info('Top controller heard ' + e.name);
