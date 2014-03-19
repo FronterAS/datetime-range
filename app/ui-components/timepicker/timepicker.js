@@ -12,7 +12,7 @@ angular.module('ui-components')
             return {
                 templateUrl: 'ui-components/timepicker/timepicker.html',
                 restrict: 'E',
-                priority: 3,
+                priority: 0,
                 replace: true,
                 scope: true,
 
@@ -37,12 +37,6 @@ angular.module('ui-components')
 
                     scope.api = element.pickatime('picker');
 
-                    scope.$on('allDayChanged', function (e, isChecked) {
-                        if (!isChecked) {
-                            element.trigger('change');
-                        }
-                    });
-
                     scope.setupSetEvent = function (name) {
                         scope.api.on('set', function () {
                             scope.$emit(name, {
@@ -51,6 +45,12 @@ angular.module('ui-components')
                             });
                         });
                     };
+
+                    scope.$on('allDayChanged', function (e, isChecked) {
+                        if (!isChecked) {
+                            element.trigger('change');
+                        }
+                    });
                 }
             };
         }
@@ -66,7 +66,7 @@ angular.module('ui-components')
         function startTimePickerDirective(DatetimeHelper) {
             return {
                 restrict: 'A',
-                priority: 4,
+                priority: 1,
 
                 link: function (scope, element, attrs) {
                     console.info('linking startTime');
@@ -87,7 +87,7 @@ angular.module('ui-components')
         function endTimePickerDirective(DatetimeHelper) {
             return {
                 restrict: 'A',
-                priority: 5,
+                priority: 2,
                 link: function (scope, element, attrs) {
                     console.info('linking endTime');
 

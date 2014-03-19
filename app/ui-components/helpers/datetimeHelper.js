@@ -56,9 +56,45 @@ angular.module('ui-components')
              * @param {formatString} formatString A valid date format string.
              */
             getDate: function (formatString) {
-                formatString = formatString || 'yyyy-mm-dd';
-
+                formatString = formatString || 'YYYY-MM-DD';
                 return moment().format(formatString);
+            },
+
+            /**
+             * The pickadate library seems to require a lowercase format.
+             * Since we will follow momentjs formatting, we are expecting a dateformat in uppercase.
+             * We need to adapt date to work with the pickadate library.
+             *
+             * @param  {string} dateFormat The momentjs date format. i.e. YYYY-MM-DD
+             * @return {string}            The lowercased date format
+             */
+            adaptDateFormat: function (dateFormat) {
+                dateFormat = dateFormat.toLowerCase(dateFormat);
+                return dateFormat;
+            },
+
+            /**
+             * Facade function to determine if a pickadate date is the same as
+             * a second supplied pickadate date.
+             *
+             * @param  {object}  dateA A pickadate object. Contains a 'pick' property.
+             * @param  {object}  dateB A pickadate object. Contains a 'pick' property.
+             * @return {boolean}
+             */
+            isSameDate: function (dateA, dateB) {
+                return dateA.pick === dateB.pick;
+            },
+
+            /**
+             * Facade function to determine if a pickadate date is earlier than
+             * a second supplied pickadate date.
+             *
+             * @param  {object}  dateA A pickadate object. Contains a 'pick' property.
+             * @param  {object}  dateB A pickadate object. Contains a 'pick' property.
+             * @return {boolean}
+             */
+            isEarlierDate: function (dateA, dateB) {
+                return dateA.pick < dateB.pick;
             },
 
             /**

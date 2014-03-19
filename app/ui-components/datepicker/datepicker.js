@@ -12,12 +12,14 @@ angular.module('ui-components')
             return {
                 templateUrl: 'ui-components/datepicker/datepicker.html',
                 restrict: 'E',
-                priority: 5,
+                priority: 0,
                 replace: true,
                 scope: true,
 
                 link: function (scope, element, attrs) {
                     console.info('linking datepicker');
+
+                    scope.dateFormat = DatetimeHelper.adaptDateFormat(scope.dateFormat);
 
                     element.pickadate({
                         'format': scope.dateFormat,
@@ -50,50 +52,69 @@ angular.module('ui-components')
             };
         }
     )
-    // .directive(
-    //     'startDate',
-    //     /**
-    //      * Handles behaviour specific to a start date in a range directive.
-    //      *
-    //      * @return {object}
-    //      */
-    //     function startDatePickerDirective() {
-    //         return {
-    //             restrict: 'A',
-    //             priority: 3,
-    //             link: function (scope, element, attrs) {
-    //                 console.info('linking startDate');
-    //                 scope.setupSetEvent('startDateChange');
-    //             }
-    //         };
-    //     }
-    // )
-    // .directive(
-    //     'endDate',
-    //     /**
-    //      * Handles behaviour specific to an end date in a range directive.
-    //      *
-    //      * @return {object}
-    //      */
-    //     function endDatePickerDirective() {
-    //         return {
-    //             restrict: 'A',
-    //             priority: 2,
-    //             link: function (scope, element, attrs) {
-    //                 console.info('linking endDate');
+    .directive(
+        'startDate',
+        /**
+         * Handles behaviour specific to a start date in a range directive.
+         *
+         * @return {object}
+         */
+        function startDatePickerDirective() {
+            return {
+                restrict: 'A',
+                priority: 1,
+                link: function (scope, element, attrs) {
+                    console.info('linking startDate');
+                    scope.setupSetEvent('startDateChange');
+                }
+            };
+        }
+    )
+    .directive(
+        'endDate',
+        /**
+         * Handles behaviour specific to an end date in a range directive.
+         *
+         * @return {object}
+         */
+        function endDatePickerDirective(DatetimeHelper) {
+            return {
+                restrict: 'A',
+                priority: 2,
+                link: function (scope, element, attrs) {
+                    var startDateCache;
 
-    //                 scope.$on('startDateChanged', function (e, startDate) {
-    //                     var selectedDate = scope.api.get('select');
+                    console.info('linking endDate');
 
-    //                     console.info('endDate heard startDateChanged, setting end date min');
+                    scope.$on('startDateChanged', function (e, startDate) {
+                        var selectedDate = scope.api.get('select');
 
-    //                     if (selectedDate && selectedDate.pick < startDate.pick) {
-    //                         scope.api.set('select', startDate);
-    //                     }
-    //                 });
 
-    //                 scope.setupSetEvent('endDateChange');
-    //             }
-    //         };
-    //     }
-    // );
+                        // Silently fail if selectedDate doesn't exist for some reason.
+                        // A normal occurance will be that no date has been selected yet during
+                        // the build phase of the component.
+                        if (selectedDate) {
+                            // If the startDate and endDate are the same, we assume that the
+                            // user wants to change the endDate to match the start date.
+                            if (DatetimeHelper.isSameDate(selectedDate, startDateCache) ||
+                                // If the endDate is now earlier than the startDate we must update the
+                                // endDate to match.
+                                DatetimeHelper.isEarlierDate(selectedDate, startDate)
+                                ) {
+                                console.info('endDate was same as startDate, setting end date');
+                                scope.api.set('select', startDate);
+                            }
+
+                            console.info('endDate heard startDateChanged, setting end date min to ');
+                            console.log(startDate);
+                            scope.api.set('min', startDate);
+                        }
+
+                        startDateCache = startDate;
+                    });
+
+                    scope.setupSetEvent('endDateChange');
+                }
+            };
+        }
+    );
