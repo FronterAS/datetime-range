@@ -2,7 +2,7 @@
 
 angular.module('ui-components')
     .directive(
-        'timePicker',
+        'timepicker',
         /**
          * Sets up an element as a timepicker.
          *
@@ -10,7 +10,7 @@ angular.module('ui-components')
          */
         function timePickerDirective($timeout, DatetimeHelper) {
             return {
-                templateUrl: 'timepicker.html',
+                templateUrl: 'ui-components/timepicker/timepicker.html',
                 restrict: 'E',
                 priority: 3,
                 replace: true,
@@ -51,6 +51,89 @@ angular.module('ui-components')
                             });
                         });
                     };
+                }
+            };
+        }
+    )
+
+    .directive(
+        'startTime',
+        /**
+         * Handles behaviour specific to an start time in a range directive.
+         *
+         * @return {object}
+         */
+        function startTimePickerDirective(DatetimeHelper) {
+            return {
+                restrict: 'A',
+                priority: 4,
+
+                link: function (scope, element, attrs) {
+                    console.info('linking startTime');
+
+                    scope.setupSetEvent('startTimeChange');
+                    scope.setup(DatetimeHelper.getTime(scope.timeFormat));
+                }
+            };
+        }
+    )
+    .directive(
+        'endTime',
+        /**
+         * Handles behaviour specific to an end time in a range directive.
+         *
+         * @return {object}
+         */
+        function endTimePickerDirective(DatetimeHelper) {
+            return {
+                restrict: 'A',
+                priority: 5,
+                link: function (scope, element, attrs) {
+                    console.info('linking endTime');
+
+                    var setMinTime = function (e, startTime) {
+                        var min = false,
+                            selectedTime = scope.api.get('select');
+
+                        if (scope.isSameDay()) {
+                            if (selectedTime && startTime.pick > selectedTime.pick) {
+                                scope.api.set('selected', startTime);
+                            }
+                        }
+                    };
+
+                    // setup events first
+                    scope.$on('startTimeChanged', setMinTime);
+                    scope.setupSetEvent('endTimeChange');
+
+                    // then update your directive stuff!
+                    scope.setup(DatetimeHelper.getTime(scope.timeFormat, 1));
+                }
+            };
+        }
+    )
+    .directive(
+        'allday',
+        /**
+         * This directive shares the scope of the parent directive.
+         * @return {object}
+         */
+        function allDayDirective() {
+            return {
+                templateUrl: 'ui-components/timepicker/allday.html',
+                restrict: 'E',
+                replace: true,
+                scope: true,
+
+                link: function (scope, element, attrs) {
+                    console.info('linking allday');
+
+                    // element is a checkbox
+                    element.on('change', function () {
+                        // We $emit the event up to the parent, so that the event
+                        // can be detected if wanted on all parent controllers.
+                        scope.$emit('allDayChange', element.is(':checked'));
+                    });
                 }
             };
         }

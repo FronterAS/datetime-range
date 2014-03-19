@@ -2,7 +2,7 @@
 
 angular.module('ui-components')
     .directive(
-        'datePicker',
+        'datepicker',
         /**
          * Sets up an element as a datepicker.
          *
@@ -10,9 +10,9 @@ angular.module('ui-components')
          */
         function datePickerDirective($timeout, DatetimeHelper) {
             return {
-                templateUrl: 'datepicker.html',
+                templateUrl: 'ui-components/datepicker/datepicker.html',
                 restrict: 'E',
-                priority: 0,
+                priority: 5,
                 replace: true,
                 scope: true,
 
@@ -49,4 +49,51 @@ angular.module('ui-components')
                 }
             };
         }
-    );
+    )
+    // .directive(
+    //     'startDate',
+    //     /**
+    //      * Handles behaviour specific to a start date in a range directive.
+    //      *
+    //      * @return {object}
+    //      */
+    //     function startDatePickerDirective() {
+    //         return {
+    //             restrict: 'A',
+    //             priority: 3,
+    //             link: function (scope, element, attrs) {
+    //                 console.info('linking startDate');
+    //                 scope.setupSetEvent('startDateChange');
+    //             }
+    //         };
+    //     }
+    // )
+    // .directive(
+    //     'endDate',
+    //     /**
+    //      * Handles behaviour specific to an end date in a range directive.
+    //      *
+    //      * @return {object}
+    //      */
+    //     function endDatePickerDirective() {
+    //         return {
+    //             restrict: 'A',
+    //             priority: 2,
+    //             link: function (scope, element, attrs) {
+    //                 console.info('linking endDate');
+
+    //                 scope.$on('startDateChanged', function (e, startDate) {
+    //                     var selectedDate = scope.api.get('select');
+
+    //                     console.info('endDate heard startDateChanged, setting end date min');
+
+    //                     if (selectedDate && selectedDate.pick < startDate.pick) {
+    //                         scope.api.set('select', startDate);
+    //                     }
+    //                 });
+
+    //                 scope.setupSetEvent('endDateChange');
+    //             }
+    //         };
+    //     }
+    // );
