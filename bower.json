@@ -9,6 +9,7 @@
   "license": "MIT",
   "dependencies": {
     "pickadate": "~3.4.0",
-    "momentjs": "~2.5.1"
+    "momentjs": "~2.5.1",
+    "angular": "~1.2.16"
   }
 }
